@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>WebAssembly Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+      
+      <h1>Recursive Fibonacci Test</h1>
+      <h3>Choose a number to compute to</h3>
+      <div class="username">
+        <label for="num">Number:</label>
+        <input type="text" id="num" name="num" required
+               minLength="1" maxLength="3"
+               placeholder="Maybe something < 45" />
+        <span class="validity"></span>
+        <button id="submit">Submit</button>
+        <div id="results"></div>
+    </div>
+
+    <!-- Include the JavaScript glue code. -->
+    <!-- This will load the WebAssembly module and run its main. --> 
+    <script src="index.js"></script>
+    
+    <script>
+    
+        var tick, tock;
+        
+        var sub = document.querySelector('#submit');
+        sub.addEventListener('click', function(){
+          var div = document.getElementById('results')
+            function jsFib(i){
+                if (i <= 1) return i;
+                return jsFib(i-1) + jsFib(i-2)
+            }
+            function appendResults(p, r, t) {
+                div.append(p + " Results:");
+                [r,t].forEach(x => {
+                  var node = document.createElement("p");
+                  var tnode = document.createTextNode(x)
+                  node.appendChild(tnode)
+                  div.appendChild(node)
+                })
+            }
+            
+            var input = document.querySelector('#num').value
+            
+            if (parseInt(input) > 45) {
+                var div = document.getElementById('results')
+                div.innerHTML = '';
+                div.append("I don't have all day. Choose a smaller number")
+            } else {
+              div.innerHTML = '';
+              tick = performance.now()
+              var cResult = Module.ccall('fib', 'number', ['number'], [parseInt(input)]);
+              tock = performance.now()
+              appendResults("C++", cResult, tock - tick + "ms")
+              
+              tick = performance.now()
+              var jResult = jsFib(parseInt(input))
+              tock = performance.now()
+              appendResults("Javascript", jResult, tock - tick + "ms")   
+            }
+        })
+        
+    </script>
+
+  </body>
+</html> 
